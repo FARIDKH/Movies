@@ -13,44 +13,47 @@ import SwiftUI
 struct MoviesByCategoriesView: View {
     
     
+    @Binding var categorizedMovies : Dictionary<Int,[Movie]>
     
-    let delimeter = abs(movies.count / 3) + movies.count.quotientAndRemainder(dividingBy: 3).remainder
-    
-    
-    @State var selectedCategoryMovies : [Movie] = [Movie]()
-    
-    var categorizedMovies = Movie.divideMoviesByThree()
     
     var body: some View {
         VStack(alignment:.leading) {
-            ForEach((categorizedMovies.keys.sorted()),id: \.self) { key  in
+            ForEach(categorizedMovies.keys.sorted(),id: \.self) { key  in
                 HStack {
-                    ForEach(0 ..< (self.categorizedMovies[key]?.count ?? 0)) { index in
+                    ForEach(self.categorizedMovies[key]!.indices,id:\.self) { index in
                         self.makeMovieRowBy(movie: self.categorizedMovies[key]![index])
                     }
                 }
-                
+                .animation(.spring())
             }
+            
+            
         }
     }
     
     func makeMovieRowBy(movie: Movie) -> MovieRow? {
         
-        
-        
         var movieRow : MovieRow?
         
         movieRow =  MovieRow(imageName: movie.imageName, movieName: movie.name)
-        
+//        print("----")
+//        print(categorizedMovies.keys)
+//        for movie in categorizedMovies[0]! {
+//            print(movie.name)
+//        }
+//        print("----")
         return movieRow ?? nil
-        
     }
+    
     
     
 }
 
-struct MoviesByCategoriesView_Previews: PreviewProvider {
-    static var previews: some View {
-        MoviesByCategoriesView()
-    }
-}
+//struct MoviesByCategoriesView_Previews: PreviewProvider {
+//
+//    @State static var ymovies = movies
+//
+//    static var previews: some View {
+//        MoviesByCategoriesView(currentCategoryList: ymovies)
+//    }
+//}
