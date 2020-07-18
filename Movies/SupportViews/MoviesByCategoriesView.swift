@@ -13,15 +13,17 @@ import SwiftUI
 struct MoviesByCategoriesView: View {
     
     
-    @Binding var categorizedMovies : Dictionary<Int,[Movie]>
+//    @Binding var categorizedMovies : Dictionary<Int,[Movie]>
     
+    @ObservedObject var movieMV : MovieViewModel
     
     var body: some View {
         VStack(alignment:.leading) {
-            ForEach(categorizedMovies.keys.sorted(),id: \.self) { key  in
+            ForEach(movieMV.currentMovieList.keys.sorted(),id: \.self) { key  in
                 HStack {
-                    ForEach(self.categorizedMovies[key]!.indices,id:\.self) { index in
-                        self.makeMovieRowBy(movie: self.categorizedMovies[key]![index])
+                    
+                    ForEach(self.movieMV.currentMovieList[key]!.indices,id:\.self) { index in
+                        self.makeMovieRowBy(movie: self.movieMV.currentMovieList[key]![index])
                     }
                 }
                 .animation(.spring())

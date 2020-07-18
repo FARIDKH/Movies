@@ -9,7 +9,9 @@
 import SwiftUI
 
 
-let  categories = ["Popular","New","Soon","Trailers"]
+let categories = ["Popular","New","Soon","Trailers"]
+let movieViewModel = MovieViewModel()
+
 
 func createColorFromRBG(red: Double, blue: Double, green: Double) -> Color {
     return Color(red: red / 235, green: blue / 235, blue: green / 235)

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct RatingView: View {
     
-    @Binding var movie : Movie
+    @ObservedObject var movieVM : MovieViewModel
         
     var likes : [Image] = [Image]()
     
@@ -32,7 +32,7 @@ struct RatingView: View {
     }
     
     func image(for number: Int) -> Image {
-        if number > Int(movie.getLikers()) {
+        if number > Int(movieVM.currentMovie.getLikers()) {
             return offImage
         } else {
             return onImage
