@@ -18,6 +18,9 @@ struct MoviesList: View {
     
     @ObservedObject var movieVM : MovieViewModel
     @State var currentMovie : Movie = movies[0]
+    @State var leftMenuIsShowing = false
+    @State var profileIsHidden = false
+    @State var noticeIsOn = false
     
     
     init(movieVM : MovieViewModel) {
@@ -26,52 +29,68 @@ struct MoviesList: View {
     }
     
     var body: some View {
-        ScrollView(.vertical,showsIndicators: false) {
-            VStack {
-                VStack {
-                    CustomNavigationBar()
-                    
-                    MoviesCarousel(movieVM: movieVM)
-                    
-                }
-                .background(
-                    Image(movieVM.currentMovie.imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .blur(radius: 15)
+        NavigationView {
+            ZStack {
+                
+                ScrollView(.vertical,showsIndicators: false) {
+                    VStack {
+                        VStack {
+                            CustomNavigationBar(leftMenuIsShowing: $leftMenuIsShowing)
+                            
+                            MoviesCarousel(movieVM: movieVM)
+                        }
+                        .background(
+                            Image(movieVM.currentMovie.imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .blur(radius: 15)
 
-                )
-                .frame(height: 400, alignment: .center)
-                .clipped()
-                .cornerRadius(50, corners: [.bottomLeft,.bottomRight])
-                
-                VStack {
-                    HStack {
+                        )
+                        .frame(height: 400, alignment: .center)
+                        .clipped()
+                            .padding(.top,25)
+                        .cornerRadius(50, corners: [.bottomLeft,.bottomRight])
                         
-                        RatingView(movieVM: movieVM)
+                        VStack {
+                            HStack {
+                                
+                                RatingView(movieVM: movieVM)
+                                
+                            }
+                            Text(movieVM.currentMovie.description)
+                                .font(Font.custom("Poppins",size:14))
+                                .foregroundColor(.white)
+                                .padding()
+                            
+                            CategoriesSelectionView(movieVM: movieVM)
+                            
+                            MoviesByCategoriesView(movieMV: movieVM)
+                                .frame(minHeight:300,maxHeight:.infinity)
+                            
+                        }
+                        .padding(.all,30)
                         
+                        Spacer()
                     }
-                    Text(movieVM.currentMovie.description)
-                        .font(Font.custom("Poppins",size:14))
-                        .foregroundColor(.white)
-                        .padding()
-                    
-                    CategoriesSelectionView(movieVM: movieVM)
-                    
-                    MoviesByCategoriesView(movieMV: movieVM)
-                        .frame(minHeight:300,maxHeight:.infinity)
-                    
+                    .background(mainBlue())
                 }
-                .padding(.all,30)
+                .edgesIgnoringSafeArea(.all)
+                .background(mainBlue())
+                .navigationBarBackButtonHidden(true)
+                .blur(radius: !leftMenuIsShowing ? 0 : 20)
+                .animation(.easeIn)
                 
-                Spacer()
+                LeftMenuView(profileIsHidden: profileIsHidden, noticesIsOn: noticeIsOn)
+                    .offset(x: !leftMenuIsShowing ?  -UIScreen.main.bounds.width : 0)
+                    .animation(.spring())
+                    .gesture(DragGesture()
+                        .onChanged({ (value) in
+                            self.leftMenuIsShowing = false
+                        })
+                    )
             }
-            .background(mainBlue())
         }
         .edgesIgnoringSafeArea(.all)
-        .background(mainBlue())
-    
-    
     }
 }
 
@@ -107,9 +126,14 @@ struct CategoriesSelectionView: View {
 }
 
 struct CustomNavigationBar: View {
+    
+    @Binding var leftMenuIsShowing : Bool
+    
     var body: some View {
         HStack {
-            Button(action: { print("clicked") }, label: { Image("text.justifyleft") })
+            Button(action: {
+                self.leftMenuIsShowing = !self.leftMenuIsShowing
+            }, label: { Image("text.justifyleft") })
                 .foregroundColor(.white)
             Spacer()
             Text("Movie")
@@ -117,10 +141,15 @@ struct CustomNavigationBar: View {
                 .foregroundColor(.white)
                 .offset(x: 25, y: 5)
             Spacer()
-            Button(action: { print("clicked") }, label: { Image("heart") })
+            Button(action: { print("heart clicked") }, label: { Image("heart") })
                 .foregroundColor(.white)
-            Button(action: { print("clicked") }, label: { Image("person") })
-                .foregroundColor(.white)
+            
+            NavigationLink(destination: ProfileView()) {
+                Button(action: { print("person clicked") }, label: { Image("person") })
+                    .foregroundColor(.white)
+            }
+            
+            
             
         }
         .frame(width:350,height : 50)
